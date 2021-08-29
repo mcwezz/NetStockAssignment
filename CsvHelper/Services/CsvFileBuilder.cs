@@ -14,15 +14,15 @@ namespace NetStockAssignment.CsvHelper.Services
 {
 	public interface ICsvFileBuilder
 	{
-		bool ExportProducts(IEnumerable<ProductMaster> products);
-		bool ExportLocations(IEnumerable<Locations> locations);
-		bool ExportSuppliers(IEnumerable<Suppliers> suppliers);
+		bool ExportProducts(IEnumerable<ProductMaster> products, string dir);
+		bool ExportLocations(IEnumerable<Locations> locations, string dir);
+		bool ExportSuppliers(IEnumerable<Suppliers> suppliers, string dir);
 
 	}
 	class CsvFileBuilder : ICsvFileBuilder
 	{
 
-		public bool ExportLocations(IEnumerable<Locations> locations)
+		public bool ExportLocations(IEnumerable<Locations> locations,string dir)
 		{
 
 			CsvConfiguration config = new(CultureInfo.InvariantCulture);
@@ -34,7 +34,7 @@ namespace NetStockAssignment.CsvHelper.Services
 				}
 				return false;
 			};
-			using (var writer = new StreamWriter("C:\\DearSystems\\location.csv"))
+			using (var writer = new StreamWriter(dir+"location.csv"))
 			using (var csv = new CsvWriter(writer, config))
 			{
 				csv.Context.RegisterClassMap<LocationsMap>();
@@ -45,7 +45,7 @@ namespace NetStockAssignment.CsvHelper.Services
 			return true;
 		}
 
-		public bool ExportSuppliers(IEnumerable<Suppliers> suppliers)
+		public bool ExportSuppliers(IEnumerable<Suppliers> suppliers, string dir)
 		{
 
 			CsvConfiguration config = new(CultureInfo.InvariantCulture);
@@ -57,7 +57,7 @@ namespace NetStockAssignment.CsvHelper.Services
 				}
 				return false;
 			};
-			using (var writer = new StreamWriter("C:\\DearSystems\\supplier.csv"))
+			using (var writer = new StreamWriter(dir + "supplier.csv"))
 			using (var csv = new CsvWriter(writer, config))
 			{
 				csv.Context.RegisterClassMap<SuppliersMap>();
@@ -68,7 +68,7 @@ namespace NetStockAssignment.CsvHelper.Services
 			return true;
 		}
 
-		public bool ExportProducts(IEnumerable<ProductMaster> products)
+		public bool ExportProducts(IEnumerable<ProductMaster> products, string dir)
 		{
 
 			CsvConfiguration config = new(CultureInfo.InvariantCulture);
@@ -80,7 +80,7 @@ namespace NetStockAssignment.CsvHelper.Services
 				}
 				return false;
 			}; 
-			using (var writer = new StreamWriter("C:\\DearSystems\\master.csv"))
+			using (var writer = new StreamWriter(dir + "master.csv"))
 			using (var csv = new CsvWriter(writer,config))
 			{
 				csv.Context.RegisterClassMap<ProductMasterMap>();

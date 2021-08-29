@@ -132,7 +132,8 @@ namespace NetStockAssignment
 				// Option object that can be injected in any service. Use a class for each logical group.
 				services.Configure<DearOptions>(configurationRoot.GetSection(key: nameof(DearOptions)));
                 services.Configure<ExtraOptions>(configurationRoot.GetSection(key: nameof(ExtraOptions)));
-            });
+				services.Configure<CsvOptions>(configurationRoot.GetSection(key: nameof(CsvOptions)));
+			});
             return host;
         }
     }

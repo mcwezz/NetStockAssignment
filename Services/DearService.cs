@@ -7,6 +7,7 @@ using NetStockAssignment.Models.DearSystems;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -26,13 +27,15 @@ namespace NetStockAssignment.Services
 		private readonly ICsvFileBuilder _csvFileBuilder;
 		private readonly DearOptions _options;
 		private readonly ExtraOptions _extraOptions;
+		private readonly CsvOptions _csvOptions;
 
 		public DearService(
 			 IHttpClientFactory httpClientFactory,
 			 ILogger<DearService> logger,
 			 ICsvFileBuilder csvFileBuilder,
 			IOptions<DearOptions> demoOptions,
-			IOptions<ExtraOptions> extraOptions
+			IOptions<ExtraOptions> extraOptions,
+			IOptions<CsvOptions> csvOptions
 		)
 		{
 			_httpClientFactory = httpClientFactory;
@@ -40,14 +43,21 @@ namespace NetStockAssignment.Services
 			_csvFileBuilder = csvFileBuilder;
 			_options = demoOptions.Value;
 			_extraOptions = extraOptions.Value;
+			_csvOptions = csvOptions.Value;
 		}
 
 		public async Task<bool> DoWork()
 		{
-			if (!_options.Enabled || string.IsNullOrEmpty(_options.AccountID) || string.IsNullOrEmpty(_options.AppKey))
+			if (!_options.Enabled || string.IsNullOrEmpty(_options.AccountID) || string.IsNullOrEmpty(_options.AppKey) || string.IsNullOrEmpty(_csvOptions.Directory))
 			{
 				_logger.LogInformation("Service is not enabled or missing values in config options. Aborted.");
 				return false;
+			}
+
+			//TODO move this code to Startup
+			if (!Directory.Exists(_csvOptions.Directory))
+			{
+				Directory.CreateDirectory(_csvOptions.Directory);
 			}
 
 			// we can inject and use as many option objects we want
@@ -94,7 +104,7 @@ namespace NetStockAssignment.Services
 				csvProductMaster.Add(csvProductRow);
 			}
 			//Write to CSV
-			var pmSuccess = _csvFileBuilder.ExportProducts(csvProductMaster);
+			var pmSuccess = _csvFileBuilder.ExportProducts(csvProductMaster, _csvOptions.Directory);
 
 			//-----------------------------------------------------------------------------------------------------------------
 			//				Download Locations
@@ -118,7 +128,7 @@ namespace NetStockAssignment.Services
 			}
 
 			//Write to CSV
-			var locSuccess = _csvFileBuilder.ExportLocations(csvLocations);
+			var locSuccess = _csvFileBuilder.ExportLocations(csvLocations,_csvOptions.Directory);
 
 			//-----------------------------------------------------------------------------------------------------------------
 			//				Download Suppliers
@@ -142,7 +152,7 @@ namespace NetStockAssignment.Services
 			}
 
 			//Write to CSV
-			var suppliersSuccess = _csvFileBuilder.ExportSuppliers(csvSuppliers);
+			var suppliersSuccess = _csvFileBuilder.ExportSuppliers(csvSuppliers, _csvOptions.Directory);
 
 			_logger.LogInformation($"{nameof(DoWork)} completed.");
 

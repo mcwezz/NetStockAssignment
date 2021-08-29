@@ -8,7 +8,8 @@ namespace NetStockAssignment.Configuration
     {
         public DearOptions DearOptions { get; set; }
         public ExtraOptions ExtraOptions { get; set; }
-    }
+		public CsvOptions CsvOptions { get; set; }
+	}
 
     public class DearOptions
     {
@@ -22,4 +23,8 @@ namespace NetStockAssignment.Configuration
     {
         public string ConsoleId { get; set; }
     }
+	public class CsvOptions
+	{
+		public string Directory { get; set; }
+	}
 }
