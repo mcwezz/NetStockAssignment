@@ -34,7 +34,7 @@ namespace NetStockAssignment.CsvHelper.Services
 				}
 				return false;
 			};
-			using (var writer = new StreamWriter("location.csv"))
+			using (var writer = new StreamWriter("C:\\DearSystems\\location.csv"))
 			using (var csv = new CsvWriter(writer, config))
 			{
 				csv.Context.RegisterClassMap<LocationsMap>();
@@ -57,7 +57,7 @@ namespace NetStockAssignment.CsvHelper.Services
 				}
 				return false;
 			};
-			using (var writer = new StreamWriter("supplier.csv"))
+			using (var writer = new StreamWriter("C:\\DearSystems\\supplier.csv"))
 			using (var csv = new CsvWriter(writer, config))
 			{
 				csv.Context.RegisterClassMap<SuppliersMap>();
@@ -80,7 +80,7 @@ namespace NetStockAssignment.CsvHelper.Services
 				}
 				return false;
 			}; 
-			using (var writer = new StreamWriter("master.csv"))
+			using (var writer = new StreamWriter("C:\\DearSystems\\master.csv"))
 			using (var csv = new CsvWriter(writer,config))
 			{
 				csv.Context.RegisterClassMap<ProductMasterMap>();
