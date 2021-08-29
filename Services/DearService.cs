@@ -44,9 +44,9 @@ namespace NetStockAssignment.Services
 
 		public async Task<bool> DoWork()
 		{
-			if (!_options.Enabled)
+			if (!_options.Enabled || string.IsNullOrEmpty(_options.AccountID) || string.IsNullOrEmpty(_options.AppKey))
 			{
-				_logger.LogInformation("Service is not enabled in config options. Aborted.");
+				_logger.LogInformation("Service is not enabled or missing values in config options. Aborted.");
 				return false;
 			}
 
