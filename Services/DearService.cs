@@ -1,18 +1,16 @@
-﻿using NetStockAssignment.Configuration;
-using NetStockAssignment.Models.DearSystems;
-using NetStockAssignment.CsvHelper.Models;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NetStockAssignment.Configuration;
+using NetStockAssignment.CsvHelper.Models;
+using NetStockAssignment.CsvHelper.Services;
+using NetStockAssignment.Models.DearSystems;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
-using NetStockAssignment.CsvHelper.Services;
-using System.IO;
-using CsvHelper;
-using System.Globalization;
-using System;
 
 namespace NetStockAssignment.Services
 {
@@ -63,15 +61,28 @@ namespace NetStockAssignment.Services
 			httpClient.DefaultRequestHeaders.Add("api-auth-applicationkey", _options.AppKey);
 			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
+			HttpResponseMessage response;
 			//-----------------------------------------------------------------------------------------------------------------
 			//				Download Products
 			//-----------------------------------------------------------------------------------------------------------------
-			var response = await httpClient.GetAsync("product");
-			ProductsRoot products = JsonSerializer.Deserialize<ProductsRoot>(await response.Content.ReadAsByteArrayAsync());
-
 			List<ProductMaster> csvProductMaster = new List<ProductMaster>();
-			foreach(var product in products.Products)
+			ProductsRoot allProducts = new();
+			allProducts.Products = new List<Product>();
+
+			for(int i=1;i<1000;i++)
 			{
+				response = await httpClient.GetAsync("product?page="+i+"&limit=100");
+				ProductsRoot products = JsonSerializer.Deserialize<ProductsRoot>(await response.Content.ReadAsByteArrayAsync());
+
+				if (response.StatusCode != System.Net.HttpStatusCode.OK || products.Products.Count ==0)
+				{
+					break;
+				}
+				allProducts.Products.AddRange(products.Products);
+			}
+			foreach (var product in allProducts.Products)
+			{
+
 				var csvProductRow = new ProductMaster();
 				csvProductRow.Code = product.SKU;
 				csvProductRow.Description = product.ShortDescription;
@@ -82,7 +93,6 @@ namespace NetStockAssignment.Services
 
 				csvProductMaster.Add(csvProductRow);
 			}
-
 			//Write to CSV
 			var pmSuccess = _csvFileBuilder.ExportProducts(csvProductMaster);
 
