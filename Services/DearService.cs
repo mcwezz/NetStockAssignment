@@ -79,12 +79,12 @@ namespace NetStockAssignment.Services
 			ProductsRoot allProducts = new();
 			allProducts.Products = new List<Product>();
 
-			for(int i=1;i<1000;i++)
+			for (int i = 1; i < 1000; i++)
 			{
-				response = await httpClient.GetAsync("product?page="+i+"&limit=100");
+				response = await httpClient.GetAsync("product?page=" + i + "&limit=100");
 				ProductsRoot products = JsonSerializer.Deserialize<ProductsRoot>(await response.Content.ReadAsByteArrayAsync());
 
-				if (response.StatusCode != System.Net.HttpStatusCode.OK || products.Products.Count ==0)
+				if (response.StatusCode != System.Net.HttpStatusCode.OK || products.Products.Count == 0)
 				{
 					break;
 				}
@@ -118,7 +118,7 @@ namespace NetStockAssignment.Services
 			{
 				var csvLocationRow = new Locations();
 				csvLocationRow.Code = loc.ID;
-				csvLocationRow.Description = loc.Name;
+				csvLocationRow.Description = loc.Name.Length > 255 ? loc.Name.Substring(0, 255) : loc.Name;
 				csvLocationRow.Active = !loc.IsDeprecated;
 				csvLocationRow.Group = "";
 				csvLocationRow.Type = "";
@@ -128,7 +128,7 @@ namespace NetStockAssignment.Services
 			}
 
 			//Write to CSV
-			var locSuccess = _csvFileBuilder.ExportLocations(csvLocations,_csvOptions.Directory);
+			var locSuccess = _csvFileBuilder.ExportLocations(csvLocations, _csvOptions.Directory);
 
 			//-----------------------------------------------------------------------------------------------------------------
 			//				Download Suppliers
